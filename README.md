@@ -1,70 +1,283 @@
-# Getting Started with Create React App
+## UserState in react : my mood journal 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Output:
 
-## Available Scripts
+![Alt Text](https://github.com/Reshmagvs/moodjournal_userstate/blob/main/modd1.png)
+![Alt Text](https://github.com/Reshmagvs/moodjournal_userstate/blob/main/modd2.png)
 
-In the project directory, you can run:
 
-### `npm start`
+1. Create a React app using these commands in VS Code terminal :
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+npx create-react-app mood-journal
+cd mood-journal
+code .
+```
+2. To create mood journal app
+Replace the code to the below one , inside App.js which will be in src folder :
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
+import React, { useState, useEffect } from "react";
+import Confetti from "react-confetti";
+import "./App.css";
 
-### `npm test`
+const moods = [
+  { name: "Happy", emoji: "😊", color: "#74b9ff" },
+  { name: "Sad", emoji: "😢", color: "#636e72" },
+  { name: "Excited", emoji: "🎉", color: "#ff7675" },
+  { name: "Stressed", emoji: "😰", color: "#a29bfe" },
+  { name: "Tired", emoji: "😴", color: "#b2bec3" },
+];
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+const quotes = {
+  Happy: ["Keep smiling! 😊", "Happiness looks great on you! 😍", "Find joy in the little things! 🌸"],
+  Sad: ["It's okay to feel sad. ❤️", "This too shall pass. 💪", "Sending you a virtual hug! 🤗"],
+  Excited: ["Your energy is inspiring! 🚀", "Excitement fuels greatness! 🔥", "Something amazing is coming! ✨"],
+  Stressed: ["Take a deep breath. 🌿", "You are in control. 💜", "Even storms pass—this moment is temporary. ☁️"],
+  Tired: ["Rest up! 😴", "Sleep is the best meditation. 🛏️", "You can’t pour from an empty cup. ☕"],
+};
 
-### `npm run build`
+function getRandomQuote(mood) {
+  return quotes[mood][Math.floor(Math.random() * quotes[mood].length)];
+}
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+function App() {
+  const [mood, setMood] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showEmojiRain, setShowEmojiRain] = useState(false);
+  const [selectedQuote, setSelectedQuote] = useState("");
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  useEffect(() => {
+    if (mood) {
+      setSelectedQuote(getRandomQuote(mood));
+      setShowEmojiRain(true);
+      if (mood === "Excited") setShowConfetti(true);
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+      setTimeout(() => {
+        setShowConfetti(false);
+        setShowEmojiRain(false);
+      }, 3000);
+    }
+  }, [mood]);
 
-### `npm run eject`
+  return (
+    <div className={`app-container ${darkMode ? "dark-mode" : "light-mode"}`}>
+      {showConfetti && <Confetti width={window.innerWidth} height={window.innerHeight} />}
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+      {showEmojiRain && (
+        <div className="emoji-rain">
+          {Array.from({ length: 30 }).map((_, index) => (
+            <span key={index} className="emoji">
+              {moods.find((m) => m.name === mood).emoji}
+            </span>
+          ))}
+        </div>
+      )}
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+      <h1 className="title"> Mood Journal </h1>
+      <p className="subtitle">How are you feeling today?</p>
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+      <div className="mood-buttons">
+        {moods.map((m) => (
+          <button key={m.name} className="mood-btn" onClick={() => setMood(m.name)}>
+            {m.emoji} {m.name}
+          </button>
+        ))}
+      </div>
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+      {mood && (
+        <div className="quote-box">
+          <h2>{mood} {moods.find((m) => m.name === mood).emoji}</h2>
+          <p>{selectedQuote}</p>
+        </div>
+      )}
 
-## Learn More
+      <div className="toggle-container">
+        <label className="switch">
+          <input type="checkbox" checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
+          <span className="slider round"></span>
+        </label>
+      </div>
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+      <footer>🌸 Made by Reshma G.V.S. 🌸</footer>
+    </div>
+  );
+}
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+export default App;
+```
+3. Add Some Styling :
+Create App.css in the src folder and add the below code 
 
-### Code Splitting
+```
+/* Global Styles */
+body {
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  transition: background 0.5s, color 0.5s;
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+/* Light & Dark Mode */
+.light-mode {
+  background-color: #fceaff;
+  color: #333;
+}
 
-### Analyzing the Bundle Size
+.dark-mode {
+  background-color: #1b1b2f;
+  color: #fff;
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+/* App Container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 20px;
+  text-align: center;
+}
 
-### Making a Progressive Web App
+/* Title */
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+/* Subtitle */
+.subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
 
-### Advanced Configuration
+/* Mood Buttons */
+.mood-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+.mood-btn {
+  padding: 12px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #000;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
 
-### Deployment
+.mood-btn:hover {
+  transform: scale(1.1);
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+/* Quote Box */
+.quote-box {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  text-align: center;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
 
-### `npm run build` fails to minify
+/* Emoji Rain */
+.emoji-rain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+.emoji {
+  position: absolute;
+  font-size: 2rem;
+  animation: fall 3s linear infinite;
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(-100px);
+  }
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+/* Dark Mode Toggle */
+.toggle-container {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+.switch {
+  position: relative;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4cd137;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Footer */
+footer {
+  margin-top: 20px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+```
+4. Install react-confetti by running the below command in the terminal : 
+
+```
+npm install react-confetti
+```
+5. Run your app :
+```
+npm start
+```
